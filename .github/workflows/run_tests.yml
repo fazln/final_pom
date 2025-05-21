@@ -64,7 +64,7 @@ jobs:
     needs: run-tests
     steps:
       - name: Download Pages artifact
-        uses: actions/download-pages-artifact@v3
+        uses: actions/download-artifact@v3
         with:
           path: _site
 
