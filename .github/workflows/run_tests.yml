@@ -31,6 +31,8 @@ jobs:
           python-version: '3.10'
       - name: Install dependencies.
         run: pip install -r requirements.txt
+      - name: Clean old reports
+        run: rm -rf allure-results _site
       - name: run all tests
         if: "github.event.inputs.deployment_target == 'all'"
         run: pytest --alluredir=allure-results
