@@ -57,17 +57,27 @@ jobs:
         with:
           path: _site
           retention-days: 1
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: _site
   
   publish-report:
     name: Report publication
     runs-on: ubuntu-latest
     needs: run-tests
     steps:
-      - name: Download Pages artifact
+      - name: Download Allure report
         uses: actions/download-artifact@v3
+        with:
+          name: allure-report
+          path: _site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1.2.9
-      
