@@ -73,6 +73,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+      - name: List downloaded files
+        run: ls -R _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1.2.9
