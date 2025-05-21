@@ -10,7 +10,7 @@ on:
         default: smoke
         options:
           - smoke
-          - regression
+          - regress
           - all
 
 permissions:
@@ -25,45 +25,54 @@ jobs:
     steps:
       - name: Checkout autotests
         uses: actions/checkout@v4
+
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install dependencies.
+
+      - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Clean old reports
-        run: rm -rf allure-results _site
-      - name: run all tests
-        if: "github.event.inputs.deployment_target == 'all'"
+
+      - name: Run all tests
+        if: github.event.inputs.deployment_target == 'all'
         run: pytest --alluredir=allure-results
         continue-on-error: true
-      - name: run smoke tests
-        if: "github.event.inputs.deployment_target == 'smoke'"
+
+      - name: Run smoke tests
+        if: github.event.inputs.deployment_target == 'smoke'
         run: pytest -m smoke --alluredir=allure-results
         continue-on-error: true
-      - name: run regression tests
-        if: "github.event.inputs.deployment_target == 'regression'"
-        run: pytest -m regression --alluredir=allure-results
+
+      - name: Run regression tests
+        if: github.event.inputs.deployment_target == 'regress'
+        run: pytest -m regress --alluredir=allure-results
         continue-on-error: true
+
       - name: Install Java
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
           java-version: '17'
+
       - name: Install Allure
-        run: sudo wget https://github.com/allure-framework/allure2/releases/download/2.24.1/allure-2.24.1.tgz && sudo tar -zxvf allure-2.24.1.tgz -C /opt/ && sudo ln -s /opt/allure-2.24.1/bin/allure /usr/bin/allure
-      - name: Generate report
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.24.1/allure-2.24.1.tgz
+          tar -zxvf allure-2.24.1.tgz -C /opt/
+          sudo ln -s /opt/allure-2.24.1/bin/allure /usr/bin/allure
+
+      - name: Generate Allure report
         run: allure generate -c allure-results -o _site
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
-  
-  publish-report:
-    name: Report publication
+
+  deploy:
     runs-on: ubuntu-latest
     needs: run-tests
+    name: Deploy to GitHub Pages
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v1.2.9
